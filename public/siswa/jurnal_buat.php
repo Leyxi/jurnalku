@@ -5,7 +5,7 @@ check_role(['siswa']);
 include '../../app/_config/database.php';
 include '../../app/_lib/helpers.php';
 
-$user_name = $_SESSION['user_nama'] ?? 'Siswa';
+$user_name = $_SESSION['nama_lengkap'] ?? 'Siswa';
 $id_siswa = $_SESSION['user_id'];
 $error = null;
 

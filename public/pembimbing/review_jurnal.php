@@ -6,7 +6,7 @@ include '../../app/_config/database.php';
 include '../../app/_lib/helpers.php';
 
 $id_pembimbing = $_SESSION['user_id'];
-$user_name = $_SESSION['user_nama'] ?? 'Pembimbing';
+$user_name = $_SESSION['nama_lengkap'] ?? 'Pembimbing';
 $error = null;
 
 // --- Parameter and Security Validation ---

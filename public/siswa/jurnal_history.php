@@ -6,7 +6,7 @@ include '../../app/_config/database.php';
 include '../../app/_lib/helpers.php';
 
 $id_siswa = $_SESSION['user_id'];
-$user_name = $_SESSION['user_nama'] ?? 'Siswa';
+$user_name = $_SESSION['nama_lengkap'] ?? 'Siswa';
 
 // --- Fetch Jurnals with Filtering and Pagination ---
 $filter_status = sanitize_input($_GET['status'] ?? 'all');
@@ -40,11 +40,18 @@ $total_pages = ceil($total_records / $per_page);
 
 // Get data for current page
 $sql_data .= " ORDER BY tanggal_kegiatan DESC, created_at DESC LIMIT ? OFFSET ?";
-$params_data = array_merge($params, [$per_page, $offset]);
 
 $stmt_jurnals = $pdo->prepare($sql_data);
-// PDO can't bind LIMIT/OFFSET directly with non-integer values from array_merge, so we bind them separately
-$stmt_jurnals->execute($params_data);
+$stmt_jurnals->bindValue(1, $id_siswa, PDO::PARAM_INT);
+if ($filter_status !== 'all') {
+    $stmt_jurnals->bindValue(2, $filter_status, PDO::PARAM_STR);
+    $stmt_jurnals->bindValue(3, $per_page, PDO::PARAM_INT);
+    $stmt_jurnals->bindValue(4, $offset, PDO::PARAM_INT);
+} else {
+    $stmt_jurnals->bindValue(2, $per_page, PDO::PARAM_INT);
+    $stmt_jurnals->bindValue(3, $offset, PDO::PARAM_INT);
+}
+$stmt_jurnals->execute();
 $jurnals = $stmt_jurnals->fetchAll(PDO::FETCH_ASSOC);
 
 include '../../templates/header.php';
