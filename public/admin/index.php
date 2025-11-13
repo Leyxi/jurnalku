@@ -2,128 +2,163 @@
 include '../../app/_lib/auth.php';
 check_login();
 check_role(['admin']);
+include '../../app/_config/database.php';
 include '../../templates/header.php';
 
-// --- PHP Logic for Stats ---
-include '../../app/_config/database.php';
+// --- PHP Logic for Stats & Recent Activities ---
 
-// Count users
-$stmt_siswa = $pdo->query("SELECT COUNT(*) as count FROM users WHERE role = 'siswa'");
-$siswa_count = $stmt_siswa->fetch()['count'];
+// Main Stats
+$siswa_count = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'siswa'")->fetchColumn();
+$pembimbing_count = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'pembimbing'")->fetchColumn();
+$jurnal_pending_count = $pdo->query("SELECT COUNT(*) FROM jurnal_harian WHERE status = 'pending'")->fetchColumn();
+$jurnal_approved_count = $pdo->query("SELECT COUNT(*) FROM jurnal_harian WHERE status = 'approved'")->fetchColumn();
 
-$stmt_pembimbing = $pdo->query("SELECT COUNT(*) as count FROM users WHERE role = 'pembimbing'");
-$pembimbing_count = $stmt_pembimbing->fetch()['count'];
+// Recent Users
+$stmt_users = $pdo->query("SELECT id, nama_lengkap, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 5");
+$recent_users = $stmt_users->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt_jurnal = $pdo->query("SELECT COUNT(*) as count FROM jurnal_harian");
-$jurnal_count = $stmt_jurnal->fetch()['count'];
+// Recent Journals
+$stmt_journals = $pdo->query("SELECT j.id, j.tanggal_kegiatan, j.status, u.nama_lengkap as nama_siswa FROM jurnal_harian j JOIN users u ON j.id_siswa = u.id ORDER BY j.created_at DESC LIMIT 5");
+$recent_journals = $stmt_journals->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt_pengumuman = $pdo->query("SELECT COUNT(*) as count FROM pengumuman");
-$pengumuman_count = $stmt_pengumuman->fetch()['count'];
+$user_name = $_SESSION['user_nama'] ?? 'Admin';
+
 ?>
 
-<div class="min-h-screen bg-gray-50/50">
+<div class="min-h-screen bg-gray-100">
     <!-- Sidebar -->
-    <aside class="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-white sm:flex">
-        <div class="flex h-16 items-center border-b px-6">
-            <a href="#" class="flex items-center gap-2 font-semibold">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="m3 9-1.306-3.046a2 2 0 0 1 1.042-2.654l7-3.333a2 2 0 0 1 1.928 0l7 3.333a2 2 0 0 1 1.042 2.654L21 9"/><path d="M12 19v-4"/></svg>
-                <span>E-Jurnal - Admin</span>
+    <aside class="fixed inset-y-0 left-0 z-20 w-64 bg-white shadow-md flex-col hidden sm:flex">
+        <div class="flex h-16 items-center justify-center border-b">
+            <a href="#" class="flex items-center gap-2 font-bold text-lg text-gray-800">
+                <svg class="h-7 w-7 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span>E-Jurnal</span>
             </a>
         </div>
-        <nav class="flex flex-col gap-4 p-4 sm:gap-6 sm:p-6">
-            <a href="index.php" class="flex items-center gap-3 rounded-lg bg-gray-100 px-3 py-2 text-gray-900 transition-all hover:text-gray-900">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="index.php" class="flex items-center gap-3 rounded-lg bg-blue-100 text-blue-700 px-3 py-2 font-semibold">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                 Dashboard
             </a>
-            <a href="users_manage.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Manajemen User
+            <a href="users_manage.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 006-6v-1a6 6 0 00-9-5.197" /></svg>
+                Users
             </a>
-            <a href="pengumuman_manage.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M7 7h10v10"/><path d="M17 17 7 7"/></svg>
+            <a href="pengumuman_manage.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.144-6.363a1.76 1.76 0 01.592-2.145l6.364-2.144a1.76 1.76 0 012.144.592z" /></svg>
                 Pengumuman
             </a>
-             <a href="../logout.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-red-500 transition-all hover:text-red-600 mt-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            <a href="../logout.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-red-600 hover:bg-red-100 mt-auto transition-all">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 Logout
             </a>
         </nav>
     </aside>
 
     <!-- Main Content -->
-    <div class="flex flex-col sm:gap-4 sm:py-4 sm:pl-72">
-        <header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-            <h1 class="text-2xl font-bold">Dashboard Admin</h1>
+    <div class="flex flex-col sm:ml-64">
+        <!-- Header -->
+        <header class="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-white px-6">
+            <div class="flex items-center">
+                <h1 class="text-xl font-semibold">Dashboard Admin</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="font-semibold text-right">
+                    <div class="text-sm text-gray-800"><?php echo htmlspecialchars($user_name); ?></div>
+                    <div class="text-xs text-gray-500">Administrator</div>
+                </div>
+                <img class="h-10 w-10 rounded-full object-cover" src="https://ui-avatars.com/api/?name=<?php echo urlencode($user_name); ?>&background=random&color=fff" alt="User Avatar">
+            </div>
         </header>
 
-        <main class="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-            <!-- Quick Stats -->
-            <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-                <div class="rounded-lg border bg-card text-card-foreground shadow-sm" data-v0-t="card">
-                    <div class="p-6 flex flex-row items-center justify-between pb-2">
-                        <h3 class="text-sm font-medium tracking-tight">Total Siswa</h3>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-500"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                    </div>
-                    <div class="p-6 pt-0">
-                        <div class="text-2xl font-bold"><?php echo $siswa_count; ?></div>
-                    </div>
-                </div>
-                <div class="rounded-lg border bg-card text-card-foreground shadow-sm" data-v0-t="card">
-                    <div class="p-6 flex flex-row items-center justify-between pb-2">
-                        <h3 class="text-sm font-medium tracking-tight">Total Pembimbing</h3>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-500"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    </div>
-                    <div class="p-6 pt-0">
-                        <div class="text-2xl font-bold"><?php echo $pembimbing_count; ?></div>
+        <!-- Content -->
+        <main class="flex-1 p-6 space-y-6">
+            <!-- Stat Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                <div class="bg-white p-5 rounded-xl shadow-md flex items-center gap-4">
+                    <div class="p-3 bg-blue-100 rounded-full"><svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Siswa</p>
+                        <p class="text-2xl font-bold text-gray-800"><?php echo $siswa_count; ?></p>
                     </div>
                 </div>
-                <div class="rounded-lg border bg-card text-card-foreground shadow-sm" data-v0-t="card">
-                    <div class="p-6 flex flex-row items-center justify-between pb-2">
-                        <h3 class="text-sm font-medium tracking-tight">Total Jurnal</h3>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-500"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                    </div>
-                    <div class="p-6 pt-0">
-                        <div class="text-2xl font-bold"><?php echo $jurnal_count; ?></div>
+                 <div class="bg-white p-5 rounded-xl shadow-md flex items-center gap-4">
+                    <div class="p-3 bg-green-100 rounded-full"><svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Pembimbing</p>
+                        <p class="text-2xl font-bold text-gray-800"><?php echo $pembimbing_count; ?></p>
                     </div>
                 </div>
-                <div class="rounded-lg border bg-card text-card-foreground shadow-sm" data-v0-t="card">
-                    <div class="p-6 flex flex-row items-center justify-between pb-2">
-                        <h3 class="text-sm font-medium tracking-tight">Total Pengumuman</h3>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-500"><path d="M7 7h10v10"/><path d="M17 17 7 7"/></svg>
+                <div class="bg-white p-5 rounded-xl shadow-md flex items-center gap-4">
+                    <div class="p-3 bg-yellow-100 rounded-full"><svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Jurnal Pending</p>
+                        <p class="text-2xl font-bold text-gray-800"><?php echo $jurnal_pending_count; ?></p>
                     </div>
-                    <div class="p-6 pt-0">
-                        <div class="text-2xl font-bold"><?php echo $pengumuman_count; ?></div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-md flex items-center gap-4">
+                    <div class="p-3 bg-indigo-100 rounded-full"><svg class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Jurnal Disetujui</p>
+                        <p class="text-2xl font-bold text-gray-800"><?php echo $jurnal_approved_count; ?></p>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Actions -->
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <div class="rounded-xl border bg-card text-card-foreground shadow">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Manajemen User</h3>
-                        <p class="text-gray-600 mb-4">Kelola data siswa dan pembimbing, tambah user baru, atau hapus user.</p>
-                        <a href="users_manage.php" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full bg-blue-600 text-white hover:bg-blue-700">
-                            Kelola User
-                        </a>
+            <!-- Recent Activities -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Recent Users -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-semibold text-gray-800 text-lg mb-4">Pengguna Baru</h3>
+                    <div class="space-y-4">
+                        <?php foreach($recent_users as $user): ?>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <img class="h-10 w-10 rounded-full object-cover" src="https://ui-avatars.com/api/?name=<?php echo urlencode($user['nama_lengkap']); ?>&background=random&color=fff" alt="Avatar">
+                                    <div>
+                                        <p class="font-semibold text-gray-700"><?php echo htmlspecialchars($user['nama_lengkap']); ?></p>
+                                        <p class="text-sm text-gray-500"><?php echo htmlspecialchars($user['email']); ?></p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-medium px-2 py-1 rounded-full <?php echo $user['role'] === 'siswa' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'; ?>">
+                                    <?php echo ucfirst(htmlspecialchars($user['role'])); ?>
+                                </span>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
-                <div class="rounded-xl border bg-card text-card-foreground shadow">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Manajemen Pengumuman</h3>
-                        <p class="text-gray-600 mb-4">Buat pengumuman baru untuk semua pengguna, edit atau hapus pengumuman.</p>
-                         <a href="pengumuman_manage.php" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full bg-green-600 text-white hover:bg-green-700">
-                            Kelola Pengumuman
-                        </a>
-                    </div>
-                </div>
-                <div class="rounded-xl border bg-card text-card-foreground shadow">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Laporan</h3>
-                        <p class="text-gray-600 mb-4">Lihat laporan aktivitas, jurnal siswa, dan data statistik lainnya.</p>
-                        <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full bg-yellow-500 text-white hover:bg-yellow-600">
-                            Lihat Laporan
-                        </button>
+
+                <!-- Recent Journals -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-semibold text-gray-800 text-lg mb-4">Aktivitas Jurnal Terbaru</h3>
+                    <div class="space-y-3">
+                         <?php foreach($recent_journals as $jurnal): ?>
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50">
+                                <div class="flex items-center gap-3">
+                                     <span class="p-2 rounded-full <?php 
+                                        if ($jurnal['status'] == 'approved') echo 'bg-green-100';
+                                        elseif ($jurnal['status'] == 'rejected') echo 'bg-red-100';
+                                        else echo 'bg-yellow-100';
+                                    ?>">
+                                        <svg class="h-5 w-5 <?php 
+                                            if ($jurnal['status'] == 'approved') echo 'text-green-600';
+                                            elseif ($jurnal['status'] == 'rejected') echo 'text-red-600';
+                                            else echo 'text-yellow-600';
+                                        ?>" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <?php if($jurnal['status'] == 'approved'): ?> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /> <?php endif; ?>
+                                            <?php if($jurnal['status'] == 'rejected'): ?> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /> <?php endif; ?>
+                                            <?php if($jurnal['status'] == 'pending'): ?> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /> <?php endif; ?>
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <p class="font-semibold text-gray-700 text-sm">Jurnal dari <span class="font-bold"><?php echo htmlspecialchars($jurnal['nama_siswa']); ?></span></p>
+                                        <p class="text-xs text-gray-500">Status: <span class="font-medium"><?php echo ucfirst(htmlspecialchars($jurnal['status'])); ?></span> - <?php echo date('d M Y', strtotime($jurnal['tanggal_kegiatan'])); ?></p>
+                                    </div>
+                                </div>
+                                <a href="#" class="text-sm text-blue-600 hover:underline">Lihat</a>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>

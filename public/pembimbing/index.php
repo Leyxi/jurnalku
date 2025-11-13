@@ -3,106 +3,158 @@ include '../../app/_lib/auth.php';
 check_login();
 check_role(['pembimbing']);
 include '../../app/_config/database.php';
+include '../../templates/header.php';
 
 $id_pembimbing = $_SESSION['user_id'];
+$user_name = $_SESSION['user_nama'] ?? 'Pembimbing';
 
-// Ambil siswa yang dibimbing
-$stmt_siswa = $pdo->prepare("SELECT u.id, u.nama_lengkap FROM users u JOIN relasi_bimbingan r ON u.id = r.id_siswa WHERE r.id_pembimbing = ? ORDER BY u.nama_lengkap");
-$stmt_siswa->execute([$id_pembimbing]);
-$siswas = $stmt_siswa->fetchAll(PDO::FETCH_ASSOC);
+// --- PHP Logic for Stats & Student List ---
 
-// Pengumuman untuk pembimbing
-$stmt_pengumuman = $pdo->prepare("SELECT * FROM pengumuman WHERE target_audien IN ('all', 'pembimbing') ORDER BY created_at DESC LIMIT 5");
+// Total Siswa Bimbingan
+$stmt_total_siswa = $pdo->prepare("SELECT COUNT(*) FROM relasi_bimbingan WHERE id_pembimbing = ?");
+$stmt_total_siswa->execute([$id_pembimbing]);
+$total_siswa_count = $stmt_total_siswa->fetchColumn();
+
+// Jurnal Perlu Direview
+$stmt_pending = $pdo->prepare("SELECT COUNT(*) FROM jurnal_harian j JOIN relasi_bimbingan r ON j.id_siswa = r.id_siswa WHERE r.id_pembimbing = ? AND j.status = 'pending'");
+$stmt_pending->execute([$id_pembimbing]);
+$pending_jurnal_count = $stmt_pending->fetchColumn();
+
+// Ambil daftar siswa yang dibimbing beserta jumlah jurnal mereka
+$stmt_siswas = $pdo->prepare("
+    SELECT u.id, u.nama_lengkap, u.email,
+           (SELECT COUNT(*) FROM jurnal_harian WHERE id_siswa = u.id) as total_jurnal,
+           (SELECT COUNT(*) FROM jurnal_harian WHERE id_siswa = u.id AND status = 'pending') as pending_jurnal
+    FROM users u 
+    JOIN relasi_bimbingan r ON u.id = r.id_siswa 
+    WHERE r.id_pembimbing = ?
+    ORDER BY u.nama_lengkap
+");
+$stmt_siswas->execute([$id_pembimbing]);
+$siswas = $stmt_siswas->fetchAll(PDO::FETCH_ASSOC);
+
+// Ambil pengumuman terbaru
+$stmt_pengumuman = $pdo->prepare("SELECT * FROM pengumuman WHERE target_audien IN ('all', 'pembimbing') ORDER BY created_at DESC LIMIT 2");
 $stmt_pengumuman->execute();
 $pengumumans = $stmt_pengumuman->fetchAll(PDO::FETCH_ASSOC);
-?>
-<?php include '../../templates/header.php'; ?>
 
-<div class="min-h-screen bg-gray-50/50">
+?>
+
+<div class="min-h-screen bg-gray-100">
     <!-- Sidebar -->
-    <aside class="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-white sm:flex">
-        <div class="flex h-16 items-center border-b px-6">
-            <a href="#" class="flex items-center gap-2 font-semibold">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M15.2 3a2 2 0 0 1 2.8 2.8l-3.4 3.4L12 12l-4.6 4.6-3.4-3.4a2 2 0 0 1 2.8-2.8L9.8 12l4.4-4.4Z"/><path d="M10.6 10.6 3 18.2a2 2 0 0 0 2.8 2.8l7.6-7.6"/><path d="m18 6 2.8-2.8a2 2 0 0 0-2.8-2.8L16 3.2"/></svg>
-                <span>E-Jurnal - Pembimbing</span>
+    <aside class="fixed inset-y-0 left-0 z-20 w-64 bg-white shadow-md flex-col hidden sm:flex">
+        <div class="flex h-16 items-center justify-center border-b">
+            <a href="#" class="flex items-center gap-2 font-bold text-lg text-gray-800">
+                <svg class="h-7 w-7 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"/></svg>
+                <span>E-Jurnal</span>
             </a>
         </div>
-        <nav class="flex flex-col gap-4 p-4 sm:gap-6 sm:p-6">
-            <a href="index.php" class="flex items-center gap-3 rounded-lg bg-gray-100 px-3 py-2 text-gray-900 transition-all hover:text-gray-900">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="index.php" class="flex items-center gap-3 rounded-lg bg-green-100 text-green-700 px-3 py-2 font-semibold">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                 Dashboard
             </a>
-            <a href="../logout.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-red-500 transition-all hover:text-red-600 mt-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            <a href="../logout.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-red-600 hover:bg-red-100 mt-auto transition-all">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 Logout
             </a>
         </nav>
     </aside>
 
     <!-- Main Content -->
-    <div class="flex flex-col sm:gap-4 sm:py-4 sm:pl-72">
-        <header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-white px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-            <h1 class="text-2xl font-bold">Dashboard Pembimbing</h1>
+    <div class="flex flex-col sm:ml-64">
+        <!-- Header -->
+        <header class="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-white px-6">
+            <h1 class="text-xl font-semibold">Dashboard Pembimbing</h1>
+            <div class="flex items-center gap-4">
+                 <div class="font-semibold text-right">
+                    <div class="text-sm text-gray-800"><?php echo htmlspecialchars($user_name); ?></div>
+                    <div class="text-xs text-gray-500">Pembimbing</div>
+                </div>
+                <img class="h-10 w-10 rounded-full object-cover" src="https://ui-avatars.com/api/?name=<?php echo urlencode($user_name); ?>&background=random&color=fff" alt="User Avatar">
+            </div>
         </header>
 
-        <main class="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-            <!-- Pengumuman Section -->
-            <div class="mb-6">
-                <h2 class="text-xl font-semibold mb-4">Pengumuman Terbaru</h2>
+        <!-- Content -->
+        <main class="flex-1 p-6 space-y-6">
+            <!-- Stat Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-xl shadow-md flex items-center gap-4">
+                    <div class="p-3 bg-blue-100 rounded-full"><svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Siswa Bimbingan</p>
+                        <p class="text-2xl font-bold text-gray-800"><?php echo $total_siswa_count; ?></p>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-md flex items-center gap-4">
+                    <div class="p-3 bg-yellow-100 rounded-full"><svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Jurnal Perlu Direview</p>
+                        <p class="text-2xl font-bold text-gray-800"><?php echo $pending_jurnal_count; ?></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Announcements -->
+            <div class="space-y-4">
+                 <h3 class="font-semibold text-gray-800 text-lg">Pengumuman</h3>
                 <?php if (empty($pengumumans)): ?>
-                    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6 text-center text-gray-500">
-                        <p>Tidak ada pengumuman saat ini.</p>
-                    </div>
+                    <p class="text-gray-500 text-sm">Tidak ada pengumuman baru.</p>
                 <?php else: ?>
-                    <div class="grid gap-4">
-                        <?php foreach ($pengumumans as $p): ?>
-                        <div class="rounded-lg border bg-card text-card-foreground shadow-sm" data-v0-t="card">
-                            <div class="p-6">
-                                <h3 class="text-lg font-semibold text-blue-600"><?php echo htmlspecialchars($p['judul']); ?></h3>
-                                <p class="mt-2 text-gray-700"><?php echo htmlspecialchars($p['isi']); ?></p>
-                                <p class="mt-4 text-xs text-gray-500">Diposting pada: <?php echo date('d M Y', strtotime($p['created_at'])); ?></p>
-                            </div>
+                    <?php foreach ($pengumumans as $p): ?>
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                            <h4 class="font-bold text-blue-800"><?php echo htmlspecialchars($p['judul']); ?></h4>
+                            <p class="text-sm text-blue-700 mt-1"><?php echo htmlspecialchars($p['isi']); ?></p>
                         </div>
-                        <?php endforeach; ?>
-                    </div>
+                    <?php endforeach; ?>
                 <?php endif; ?>
             </div>
 
-            <!-- Daftar Siswa Bimbingan -->
-            <div>
-                <h2 class="text-xl font-semibold mb-4">Siswa Bimbingan</h2>
-                 <?php if (empty($siswas)): ?>
-                    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6 text-center text-gray-500">
-                        <p>Anda belum memiliki siswa bimbingan.</p>
-                    </div>
-                <?php else: ?>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <?php foreach ($siswas as $siswa): ?>
-                            <?php
-                            // Get pending journal count for each student
-                            $stmt_pending = $pdo->prepare("SELECT COUNT(*) as pending FROM jurnal_harian WHERE id_siswa = ? AND status = 'pending'");
-                            $stmt_pending->execute([$siswa['id']]);
-                            $pending_count = $stmt_pending->fetch(PDO::FETCH_ASSOC)['pending'];
-                            ?>
-                            <div class="rounded-xl border bg-white text-card-foreground shadow">
-                                <div class="p-6 flex flex-col items-center">
-                                    <div class="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                                    </div>
-                                    <h3 class="text-xl font-semibold text-center"><?php echo htmlspecialchars($siswa['nama_lengkap']); ?></h3>
-                                    <?php if ($pending_count > 0): ?>
-                                        <p class="text-red-500 font-bold mt-2"><?php echo $pending_count; ?> Jurnal Perlu Direview</p>
-                                    <?php else: ?>
-                                        <p class="text-green-500 mt-2">Tidak ada jurnal pending</p>
-                                    <?php endif; ?>
-                                    <a href="siswa_detail.php?id_siswa=<?php echo $siswa['id']; ?>" class="mt-4 inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 w-full bg-blue-600 text-white hover:bg-blue-700">
-                                        Lihat Detail Siswa
-                                    </a>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+            <!-- Student List -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h3 class="font-semibold text-gray-800 text-lg mb-4">Daftar Siswa Bimbingan</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Siswa</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Jurnal</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jurnal Pending</th>
+                                <th scope="col" class="relative px-6 py-3"><span class="sr-only">Aksi</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php if (empty($siswas)): ?>
+                                <tr><td colspan="4" class="px-6 py-12 text-center text-gray-500">Anda tidak memiliki siswa bimbingan.</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($siswas as $siswa): ?>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <img class="h-10 w-10 rounded-full object-cover" src="https://ui-avatars.com/api/?name=<?php echo urlencode($siswa['nama_lengkap']); ?>&background=random&color=fff" alt="">
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($siswa['nama_lengkap']); ?></div>
+                                                    <div class="text-sm text-gray-500"><?php echo htmlspecialchars($siswa['email']); ?></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500"><?php echo $siswa['total_jurnal']; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $siswa['pending_jurnal'] > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'; ?>">
+                                                <?php echo $siswa['pending_jurnal']; ?>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <a href="siswa_detail.php?id_siswa=<?php echo $siswa['id']; ?>" class="text-indigo-600 hover:text-indigo-900">Lihat Detail</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>

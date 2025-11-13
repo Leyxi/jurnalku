@@ -5,42 +5,137 @@ check_role(['admin']);
 include '../../app/_config/database.php';
 include '../../app/_lib/helpers.php';
 
-$id = $_GET['id'];
+$error = null;
+$pengumuman_id = $_GET['id'] ?? null;
+
+if (!$pengumuman_id) {
+    redirect('pengumuman_manage.php');
+}
+
+// Fetch announcement data
 $stmt = $pdo->prepare("SELECT * FROM pengumuman WHERE id = ?");
-$stmt->execute([$id]);
+$stmt->execute([$pengumuman_id]);
 $pengumuman = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $judul = sanitize($_POST['judul']);
-    $isi = sanitize($_POST['isi']);
-    $target_audien = $_POST['target_audien'];
-
-    $stmt = $pdo->prepare("UPDATE pengumuman SET judul = ?, isi = ?, target_audien = ? WHERE id = ?");
-    $stmt->execute([$judul, $isi, $target_audien, $id]);
-    redirect('pengumuman_manage.php?success=Pengumuman updated');
+if (!$pengumuman) {
+    redirect('pengumuman_manage.php');
 }
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $judul = sanitize_input($_POST['judul']);
+    $isi = sanitize_input($_POST['isi']);
+    $target_audien = sanitize_input($_POST['target_audien']);
+
+    if (empty($judul) || empty($isi) || empty($target_audien)) {
+        $error = "Judul, isi, dan target audiens wajib diisi.";
+    } else {
+        $stmt_update = $pdo->prepare("UPDATE pengumuman SET judul = ?, isi = ?, target_audien = ? WHERE id = ?");
+        if ($stmt_update->execute([$judul, $isi, $target_audien, $pengumuman_id])) {
+            redirect('pengumuman_manage.php?success=2'); // 2 for updated
+            exit;
+        } else {
+            $error = "Terjadi kesalahan saat memperbarui pengumuman.";
+        }
+    }
+    // Re-populate for display on error
+    $pengumuman['judul'] = $judul;
+    $pengumuman['isi'] = $isi;
+    $pengumuman['target_audien'] = $target_audien;
+}
+
+
+include '../../templates/header.php';
+$user_name = $_SESSION['user_nama'] ?? 'Admin';
 ?>
-<?php include '../../templates/header.php'; ?>
-<div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-6">Edit Pengumuman</h1>
-    <form action="" method="POST" class="bg-white p-6 rounded shadow">
-        <div class="mb-4">
-            <label for="judul" class="block">Judul</label>
-            <input type="text" id="judul" name="judul" value="<?php echo $pengumuman['judul']; ?>" class="w-full border px-3 py-2" required>
+
+<div class="min-h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <aside class="fixed inset-y-0 left-0 z-20 w-64 bg-white shadow-md flex-col hidden sm:flex">
+         <div class="flex h-16 items-center justify-center border-b">
+            <a href="index.php" class="flex items-center gap-2 font-bold text-lg text-gray-800">
+                <svg class="h-7 w-7 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span>E-Jurnal</span>
+            </a>
         </div>
-        <div class="mb-4">
-            <label for="isi" class="block">Isi</label>
-            <textarea id="isi" name="isi" class="w-full border px-3 py-2" rows="4" required><?php echo $pengumuman['isi']; ?></textarea>
-        </div>
-        <div class="mb-4">
-            <label for="target_audien" class="block">Target Audien</label>
-            <select id="target_audien" name="target_audien" class="w-full border px-3 py-2" required>
-                <option value="all" <?php if ($pengumuman['target_audien'] == 'all') echo 'selected'; ?>>Semua</option>
-                <option value="siswa" <?php if ($pengumuman['target_audien'] == 'siswa') echo 'selected'; ?>>Siswa</option>
-                <option value="pembimbing" <?php if ($pengumuman['target_audien'] == 'pembimbing') echo 'selected'; ?>>Pembimbing</option>
-            </select>
-        </div>
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Update Pengumuman</button>
-    </form>
+       <nav class="flex-1 p-4 space-y-2">
+            <a href="index.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                Dashboard
+            </a>
+            <a href="users_manage.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-all">
+                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 006-6v-1a6 6 0 00-9-5.197" /></svg>
+                Users
+            </a>
+            <a href="pengumuman_manage.php" class="flex items-center gap-3 rounded-lg bg-blue-100 text-blue-700 px-3 py-2 font-semibold">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.144-6.363a1.76 1.76 0 01.592-2.145l6.364-2.144a1.76 1.76 0 012.144.592z" /></svg>
+                Pengumuman
+            </a>
+            <a href="../logout.php" class="flex items-center gap-3 rounded-lg px-3 py-2 text-red-600 hover:bg-red-100 mt-auto transition-all">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                Logout
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex flex-col sm:ml-64">
+         <header class="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-white px-6">
+            <h1 class="text-xl font-semibold">Edit Pengumuman</h1>
+            <div class="flex items-center gap-4">
+                <div class="font-semibold text-right">
+                     <div class="text-sm text-gray-800"><?php echo htmlspecialchars($user_name); ?></div>
+                    <div class="text-xs text-gray-500">Administrator</div>
+                </div>
+                <img class="h-10 w-10 rounded-full object-cover" src="https://ui-avatars.com/api/?name=<?php echo urlencode($user_name); ?>&background=random&color=fff" alt="User Avatar">
+            </div>
+        </header>
+
+        <!-- Content -->
+        <main class="flex-1 p-6">
+            <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Formulir Edit Pengumuman</h2>
+
+                <?php if ($error): ?>
+                    <div class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
+                        <p class="font-bold">Error</p>
+                        <p><?php echo $error; ?></p>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST" action="edit_pengumuman.php?id=<?php echo $pengumuman['id']; ?>" class="space-y-6">
+                    <div>
+                        <label for="judul" class="block text-sm font-medium text-gray-700 mb-1">Judul</label>
+                        <input type="text" id="judul" name="judul" value="<?php echo htmlspecialchars($pengumuman['judul']); ?>" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    
+                    <div>
+                        <label for="isi" class="block text-sm font-medium text-gray-700 mb-1">Isi Pengumuman</label>
+                        <textarea id="isi" name="isi" rows="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required><?php echo htmlspecialchars($pengumuman['isi']); ?></textarea>
+                    </div>
+
+                    <div>
+                        <label for="target_audien" class="block text-sm font-medium text-gray-700 mb-1">Target Audiens</label>
+                        <select id="target_audien" name="target_audien" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="all" <?php echo ($pengumuman['target_audien'] === 'all') ? 'selected' : ''; ?>>Semua</option>
+                            <option value="siswa" <?php echo ($pengumuman['target_audien'] === 'siswa') ? 'selected' : ''; ?>>Siswa</option>
+                            <option value="pembimbing" <?php echo ($pengumuman['target_audien'] === 'pembimbing') ? 'selected' : ''; ?>>Pembimbing</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-4 pt-4">
+                        <a href="pengumuman_manage.php" class="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-all">Batal</a>
+                        <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2">
+                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                            <span>Simpan Perubahan</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
 </div>
+
 <?php include '../../templates/footer.php'; ?>
