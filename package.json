@@ -1,0 +1,12 @@
+{
+  "name": "pkl-hero-hub-v2",
+  "version": "1.0.0",
+  "description": "PKL Hero Hub v2.0 - Full-Stack PHP Native with Tailwind CSS",
+  "scripts": {
+    "build-css": "tailwindcss -i ./src/input.css -o ./public/assets/css/style.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.0",
+    "flowbite": "^1.6.0"
+  }
+}

@@ -1,0 +1,49 @@
+PKL Hero Hub v2.0 - Struktur Folder Lengkap
+==========================================
+
+/ (root)
+├── package.json                 # Konfigurasi npm untuk Tailwind & Flowbite
+├── tailwind.config.js           # Konfigurasi Tailwind CSS
+├── src/
+│   └── input.css                # Input CSS untuk Tailwind
+├── app/
+│   ├── _config/
+│   │   └── database.php         # Konfigurasi koneksi database PDO
+│   ├── _lib/
+│   │   ├── helpers.php          # Fungsi redirect() dan sanitize()
+│   │   └── auth.php             # Fungsi check_login() dan check_role()
+│   └── _logic/
+│       ├── auth_register.php    # Logika register user
+│       ├── auth_login.php       # Logika login user
+│       ├── jurnal_create.php    # Logika buat jurnal dengan upload foto
+│       ├── jurnal_delete.php    # Logika hapus jurnal dan foto
+│       ├── delete_foto.php      # Logika hapus foto individual
+│       ├── review_submit.php    # Logika submit review pembimbing
+│       ├── delete_user.php      # Logika hapus user (admin)
+│       └── delete_pengumuman.php # Logika hapus pengumuman (admin)
+├── templates/
+│   ├── header.php               # Template header HTML5 + Tailwind + Alpine.js
+│   └── footer.php               # Template footer + Flowbite JS
+└── public/
+    ├── assets/
+    │   └── css/
+    │       └── style.css        # Output CSS Tailwind (dibangun otomatis)
+    ├── uploads/
+    │   └── jurnal/              # Folder untuk upload foto jurnal
+    ├── admin/
+    │   ├── users_manage.php     # Halaman manage users (CRUD)
+    │   ├── add_user.php         # Form tambah user baru
+    │   ├── edit_user.php        # Form edit user
+    │   ├── pengumuman_manage.php # Halaman manage pengumuman (CRUD)
+    │   └── edit_pengumuman.php  # Form edit pengumuman
+    ├── pembimbing/
+    │   ├── index.php            # Dashboard pembimbing + pengumuman
+    │   ├── siswa_detail.php     # Detail jurnal siswa tertentu
+    │   └── review_jurnal.php    # Form review jurnal siswa
+    ├── siswa/
+    │   ├── index.php            # Dashboard siswa + pengumuman
+    │   ├── jurnal_buat.php      # Form buat jurnal baru
+    │   └── jurnal_edit.php      # Form edit jurnal + hapus foto
+    ├── register.php             # Halaman register siswa
+    ├── login.php                # Halaman login semua role
+    └── logout.php               # Script logout
