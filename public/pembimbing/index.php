@@ -44,15 +44,15 @@ $pengumumans = $stmt_pengumuman->fetchAll(PDO::FETCH_ASSOC);
     <!-- Sidebar -->
     <aside class="fixed inset-y-0 left-0 z-20 w-64 bg-white shadow-xl border-r border-gray-100 flex-col hidden sm:flex">
         <div class="flex h-16 items-center justify-center border-b border-gray-200">
-            <a href="#" class="flex items-center gap-2 font-bold text-lg bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
-                <div class="p-2 rounded-lg bg-gradient-to-br from-green-600 to-teal-600 text-white">
+            <a href="#" class="flex items-center gap-2 font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <div class="p-2 rounded-lg gradient-primary text-white">
                     <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"/></svg>
                 </div>
                 <span>E-Jurnal</span>
             </a>
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <a href="index.php" class="flex items-center gap-3 rounded-lg bg-gradient-to-r from-green-600 to-teal-600 text-white px-3 py-2.5 font-semibold transition duration-200">
+            <a href="index.php" class="flex items-center gap-3 rounded-lg gradient-primary text-white px-3 py-2.5 font-semibold transition duration-200">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                 Dashboard
             </a>
@@ -73,7 +73,7 @@ $pengumumans = $stmt_pengumuman->fetchAll(PDO::FETCH_ASSOC);
                     <div class="text-sm text-gray-800"><?php echo htmlspecialchars($user_name); ?></div>
                     <div class="text-xs text-gray-500">Pembimbing</div>
                 </div>
-                <img class="h-10 w-10 rounded-full object-cover border-2 border-green-600" src="https://ui-avatars.com/api/?name=<?php echo urlencode($user_name); ?>&background=16a34a&color=fff" alt="User Avatar">
+                <img class="h-10 w-10 rounded-full object-cover border-2 border-indigo-600" src="https://ui-avatars.com/api/?name=<?php echo urlencode($user_name); ?>&background=667eea&color=fff" alt="User Avatar">
             </div>
         </header>
 
@@ -121,7 +121,7 @@ $pengumumans = $stmt_pengumuman->fetchAll(PDO::FETCH_ASSOC);
             <!-- Student List -->
             <div class="bg-white p-8 rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100">
                 <h3 class="font-bold text-gray-900 text-lg mb-6 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 006-6v-1a6 6 0 00-9-5.197"/></svg>
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 006-6v-1a6 6 0 00-9-5.197"/></svg>
                     Daftar Siswa Bimbingan
                 </h3>
                 <div class="overflow-x-auto">
@@ -160,7 +160,7 @@ $pengumumans = $stmt_pengumuman->fetchAll(PDO::FETCH_ASSOC);
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right">
                                             <div class="flex justify-end items-center gap-2">
-                                                <a href="siswa_detail.php?id_siswa=<?php echo $siswa['id']; ?>" class="text-sm font-bold text-green-600 hover:text-green-700 transition">Lihat Detail →</a>
+                                                <a href="siswa_detail.php?id_siswa=<?php echo $siswa['id']; ?>" class="text-sm font-bold text-indigo-600 hover:text-indigo-700 transition">Lihat Detail →</a>
                                                 <form action="../../app/_logic/remove_relasi.php" method="POST" onsubmit="return confirm('Hapus relasi dengan siswa ini?');">
                                                     <?php
                                                     // find relation id for this pembimbing-siswa pair

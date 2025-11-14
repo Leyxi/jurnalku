@@ -76,16 +76,16 @@ $status_data_json = json_encode([$approved_jurnal_count, $pending_jurnal_count, 
 
 ?>
 
-<div x-data="dashboardApp()" class="min-h-screen transition-colors duration-300" :class="darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-slate-50 via-white to-slate-100'">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
     
     <!-- Mobile Menu Backdrop -->
     <div x-show="mobileMenuOpen" @click="mobileMenuOpen = false" class="fixed inset-0 z-20 bg-black/50 md:hidden animate-fadeIn" style="display: none;"></div>
 
     <!-- Sidebar -->
-    <aside class="fixed inset-y-0 left-0 z-30 w-64 transition-transform duration-300 md:translate-x-0 flex flex-col" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'" :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'" style="border-right: 1px solid currentColor;">
-        
+    <aside class="fixed inset-y-0 left-0 z-30 w-64 transition-transform duration-300 md:translate-x-0 flex flex-col bg-white border-gray-100" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'" style="border-right: 1px solid currentColor;">
+
         <!-- Sidebar Header -->
-        <div class="flex h-20 items-center justify-between px-6 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-100'">
+        <div class="flex h-20 items-center justify-between px-6 border-b border-gray-100">
             <a href="index.php" class="flex items-center gap-3 font-bold text-xl">
                 <div class="p-2.5 rounded-lg gradient-primary text-white font-bold text-lg">E</div>
                 <span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Jurnal</span>
@@ -101,12 +101,12 @@ $status_data_json = json_encode([$approved_jurnal_count, $pending_jurnal_count, 
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4m0 0l4-4"/></svg>
                 Dashboard
             </a>
-            <a href="jurnal_history.php" class="flex items-center gap-3 rounded-xl px-4 py-3 font-medium transition-all duration-200" :class="darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'">
+            <a href="jurnal_history.php" class="flex items-center gap-3 rounded-xl px-4 py-3 font-medium transition-all duration-200 text-gray-700 hover:bg-gray-100">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 Riwayat Jurnal
             </a>
-            <div class="my-2 border-t" :class="darkMode ? 'border-gray-700' : 'border-gray-200'"></div>
-            <a href="../logout.php" class="flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-red-600 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20">
+            <div class="my-2 border-t border-gray-200"></div>
+            <a href="../logout.php" class="flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-red-600 transition-all duration-200 hover:bg-red-50">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                 Logout
             </a>
@@ -121,49 +121,49 @@ $status_data_json = json_encode([$approved_jurnal_count, $pending_jurnal_count, 
     <div class="flex flex-col md:ml-64">
         
         <!-- Top Header/Navbar -->
-        <header class="sticky top-0 z-20 flex h-20 items-center justify-between px-6 border-b transition-colors duration-300" :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'" style="backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.8);">
-            
+        <header class="sticky top-0 z-20 flex h-20 items-center justify-between px-6 bg-white border-b border-gray-100" style="backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.8);">
+
             <!-- Mobile Menu Toggle -->
-            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2.5 hover:bg-gray-100 rounded-xl transition-colors">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
             </button>
 
             <!-- Search Bar -->
             <div class="hidden md:flex flex-1 max-w-md mx-4">
                 <div class="relative w-full">
-                    <input type="text" placeholder="Cari jurnal..." class="w-full px-4 py-2.5 rounded-xl border transition-all duration-200" :class="darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20' : 'bg-gray-100 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20'">
+                    <input type="text" placeholder="Cari jurnal..." class="w-full px-4 py-2.5 rounded-xl bg-gray-100 border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200">
                     <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
             </div>
 
             <!-- Right Actions -->
             <div class="flex items-center gap-3 md:gap-4">
-                
+
                 <!-- Notifications -->
                 <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" class="relative p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+                    <button @click="open = !open" class="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                         <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                     </button>
-                    <div x-show="open" @click.outside="open = false" class="absolute right-0 mt-2 w-80 rounded-xl shadow-xl z-50 animate-slideInUp" :class="darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-100'">
-                        <div class="p-4 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-100'">
+                    <div x-show="open" @click.outside="open = false" class="absolute right-0 mt-2 w-80 rounded-xl shadow-xl z-50 animate-slideInUp bg-white border border-gray-100">
+                        <div class="p-4 border-b border-gray-100">
                             <h3 class="font-bold text-lg">Notifikasi</h3>
                         </div>
                         <div class="max-h-96 overflow-y-auto">
-                            <div class="p-4 border-b" :class="darkMode ? 'border-gray-700 hover:bg-gray-750' : 'border-gray-100 hover:bg-gray-50'" style="cursor: pointer;">
+                            <div class="p-4 border-b border-gray-100 hover:bg-gray-50" style="cursor: pointer;">
                                 <div class="flex gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center flex-shrink-0">
-                                        <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     </div>
                                     <div class="flex-1">
                                         <p class="font-semibold text-sm">Jurnal Disetujui</p>
-                                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Jurnal tanggal 10 November telah disetujui oleh pembimbing.</p>
+                                        <p class="text-xs text-gray-600 mt-1">Jurnal tanggal 10 November telah disetujui oleh pembimbing.</p>
                                         <p class="text-xs text-gray-400 mt-2">2 jam yang lalu</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="p-4">
-                                <button class="w-full text-center text-sm text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">Lihat Semua Notifikasi</button>
+                                <button class="w-full text-center text-sm text-indigo-600 font-semibold hover:underline">Lihat Semua Notifikasi</button>
                             </div>
                         </div>
                     </div>
@@ -171,20 +171,20 @@ $status_data_json = json_encode([$approved_jurnal_count, $pending_jurnal_count, 
 
                 <!-- User Profile Dropdown -->
                 <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" class="flex items-center gap-2 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+                    <button @click="open = !open" class="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-xl transition-colors">
                         <img class="w-10 h-10 rounded-full object-cover border-2 border-indigo-600" src="https://ui-avatars.com/api/?name=<?php echo urlencode($user_name); ?>&background=667eea&color=fff" alt="Avatar">
                         <div class="hidden sm:flex flex-col text-left text-sm">
-                            <span class="font-semibold text-gray-900 dark:text-white"><?php echo htmlspecialchars(explode(' ', $user_name)[0]); ?></span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Siswa</span>
+                            <span class="font-semibold text-gray-900"><?php echo htmlspecialchars(explode(' ', $user_name)[0]); ?></span>
+                            <span class="text-xs text-gray-500">Siswa</span>
                         </div>
                         <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
                     </button>
-                    <div x-show="open" @click.outside="open = false" class="absolute right-0 mt-2 w-56 rounded-xl shadow-xl z-50 animate-slideInUp" :class="darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-100'">
-                        <div class="p-4 border-b" :class="darkMode ? 'border-gray-700' : 'border-gray-100'">
-                            <p class="font-semibold text-gray-900 dark:text-white"><?php echo htmlspecialchars($user_name); ?></p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Siswa PKL</p>
+                    <div x-show="open" @click.outside="open = false" class="absolute right-0 mt-2 w-56 rounded-xl shadow-xl z-50 animate-slideInUp bg-white border border-gray-100">
+                        <div class="p-4 border-b border-gray-100">
+                            <p class="font-semibold text-gray-900"><?php echo htmlspecialchars($user_name); ?></p>
+                            <p class="text-xs text-gray-500">Siswa PKL</p>
                         </div>
-                        <a href="../logout.php" class="block px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-t" :class="darkMode ? 'border-gray-700' : 'border-gray-100'">
+                        <a href="../logout.php" class="block px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 border-t border-gray-100">
                             Logout
                         </a>
                     </div>
@@ -218,7 +218,7 @@ $status_data_json = json_encode([$approved_jurnal_count, $pending_jurnal_count, 
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 animate-slideInUp" style="animation-delay: 0.1s;">
                     <!-- Total Jurnal -->
-                    <div class="group relative rounded-xl p-6 transition-all duration-300 shadow-lg hover:shadow-2xl" :class="darkMode ? 'bg-gradient-to-br from-blue-900/40 to-blue-800/40 border border-blue-700/50' : 'bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200'">
+                    <div class="group relative rounded-xl p-6 transition-all duration-300 shadow-lg hover:shadow-2xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
                         <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
                         <div class="relative z-10">
                             <div class="flex items-center justify-between mb-4">
@@ -233,7 +233,7 @@ $status_data_json = json_encode([$approved_jurnal_count, $pending_jurnal_count, 
                     </div>
 
                     <!-- Approved -->
-                    <div class="group relative rounded-xl p-6 transition-all duration-300 shadow-lg hover:shadow-2xl" :class="darkMode ? 'bg-gradient-to-br from-green-900/40 to-emerald-900/40 border border-green-700/50' : 'bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200'">
+                    <div class="group relative rounded-xl p-6 transition-all duration-300 shadow-lg hover:shadow-2xl bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200">
                         <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
                         <div class="relative z-10">
                             <div class="flex items-center justify-between mb-4">
@@ -253,7 +253,7 @@ $status_data_json = json_encode([$approved_jurnal_count, $pending_jurnal_count, 
                     </div>
 
                     <!-- Pending -->
-                    <div class="group relative rounded-xl p-6 transition-all duration-300 shadow-lg hover:shadow-2xl" :class="darkMode ? 'bg-gradient-to-br from-amber-900/40 to-orange-900/40 border border-amber-700/50' : 'bg-gradient-to-br from-amber-50 to-orange-100 border border-amber-200'">
+                    <div class="group relative rounded-xl p-6 transition-all duration-300 shadow-lg hover:shadow-2xl bg-gradient-to-br from-amber-50 to-orange-100 border border-amber-200">
                         <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
                         <div class="relative z-10">
                             <div class="flex items-center justify-between mb-4">
@@ -273,7 +273,7 @@ $status_data_json = json_encode([$approved_jurnal_count, $pending_jurnal_count, 
                     </div>
 
                     <!-- Rejected -->
-                    <div class="group relative rounded-xl p-6 transition-all duration-300 shadow-lg hover:shadow-2xl" :class="darkMode ? 'bg-gradient-to-br from-red-900/40 to-rose-900/40 border border-red-700/50' : 'bg-gradient-to-br from-red-50 to-rose-100 border border-red-200'">
+                    <div class="group relative rounded-xl p-6 transition-all duration-300 shadow-lg hover:shadow-2xl bg-gradient-to-br from-red-50 to-rose-100 border border-red-200">
                         <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
                         <div class="relative z-10">
                             <div class="flex items-center justify-between mb-4">

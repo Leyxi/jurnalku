@@ -654,11 +654,7 @@
                     <h4>Cloud Based</h4>
                     <p>Akses dari mana saja kapan saja</p>
                 </div>
-                <div class="fitur-card">
-                    <div class="fitur-icon">🌙</div>
-                    <h4>Mode Gelap</h4>
-                    <p>Desain eye-friendly untuk kenyamanan maksimal</p>
-                </div>
+
 
             </div>
         </div>

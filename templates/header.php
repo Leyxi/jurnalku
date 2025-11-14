@@ -17,7 +17,6 @@
     <!-- Tailwind CSS v3 CDN -->
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {}
             }
@@ -110,9 +109,6 @@
                     <span>E-Jurnal PKL</span>
                 </a>
                 <div class="navbar-buttons">
-                    <button id="themeToggle" class="btn btn-outline" style="background: transparent; border: 1px solid #e5e7eb; color: #111827;">
-                        <i class="fas fa-moon"></i>
-                    </button>
                     <a href="<?php echo $register_link; ?>" class="btn btn-primary">
                         <i class="fas fa-user-plus"></i> Daftar
                     </a>
@@ -120,57 +116,4 @@
             </div>
         </nav>
 
-        <script>
-            // Theme Toggle Script - Initialize dark mode on page load
-            function initializeTheme() {
-                const htmlElement = document.documentElement;
-                const savedTheme = localStorage.getItem('theme') || 'light';
-                
-                if (savedTheme === 'dark') {
-                    htmlElement.classList.add('dark');
-                } else {
-                    htmlElement.classList.remove('dark');
-                }
-                updateThemeToggleIcon();
-            }
-            
-            function updateThemeToggleIcon() {
-                const themeToggle = document.getElementById('themeToggle');
-                const htmlElement = document.documentElement;
-                if (themeToggle) {
-                    if (htmlElement.classList.contains('dark')) {
-                        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                        themeToggle.style.color = '#fbbf24';
-                    } else {
-                        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                        themeToggle.style.color = '#111827';
-                    }
-                }
-            }
-            
-            // Initialize theme immediately on load
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initializeTheme);
-            } else {
-                initializeTheme();
-            }
-            
-            // Setup theme toggle button
-            document.addEventListener('DOMContentLoaded', function() {
-                const themeToggle = document.getElementById('themeToggle');
-                const htmlElement = document.documentElement;
-                
-                // Toggle theme on button click
-                themeToggle?.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (htmlElement.classList.contains('dark')) {
-                        htmlElement.classList.remove('dark');
-                        localStorage.setItem('theme', 'light');
-                    } else {
-                        htmlElement.classList.add('dark');
-                        localStorage.setItem('theme', 'dark');
-                    }
-                    updateThemeToggleIcon();
-                });
-            });
-        </script>
+
