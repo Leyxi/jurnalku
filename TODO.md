@@ -1,0 +1,4 @@
+- [x] Hapus dark mode dari templates/header.php
+- [x] Hapus dark mode dari public/index.php
+- [x] Hapus dark mode dari public/siswa/index.php
+- [x] Update QUICK_START.md dan file dokumentasi lainnya

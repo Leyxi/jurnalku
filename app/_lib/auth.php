@@ -1,5 +1,8 @@
 <?php
-session_start();
+// Start session only if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 function check_login() {
     if (!isset($_SESSION['user_id'])) {

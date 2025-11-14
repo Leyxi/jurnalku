@@ -1,0 +1,220 @@
+/* Modern E-Jurnal Styling */
+:root {
+    --primary: #667eea;
+    --primary-dark: #5568d3;
+    --secondary: #764ba2;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+}
+
+/* Smooth Transitions */
+* {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Base Styling */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Gradient Primary */
+.gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-modern {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+}
+
+.gradient-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* Card Styling */
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* Button Modern */
+.btn-modern {
+    transition: all 0.3s ease;
+    font-weight: 600;
+    border-radius: 0.75rem;
+}
+
+.btn-modern:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.btn-modern:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Input Styling */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Sidebar Active States */
+aside a.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Status Badges */
+.badge-success {
+    @apply bg-green-100 text-green-800;
+}
+
+.badge-warning {
+    @apply bg-amber-100 text-amber-800;
+}
+
+.badge-danger {
+    @apply bg-red-100 text-red-800;
+}
+
+.badge-info {
+    @apply bg-blue-100 text-blue-800;
+}
+
+/* Tables */
+table tbody tr {
+    @apply hover:bg-gray-50 transition-colors;
+}
+
+table th {
+    @apply bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slideIn {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Utility Classes */
+.shadow-soft {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-hard {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Link Styling */
+a {
+    @apply no-underline;
+}
+
+a:hover {
+    @apply underline;
+}
+
+/* Loading State */
+.loading {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+    h1 {
+        @apply text-xl;
+    }
+    
+    h2 {
+        @apply text-lg;
+    }
+    
+    .container {
+        @apply px-4;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .no-print {
+        @apply hidden;
+    }
+}

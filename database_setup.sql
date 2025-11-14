@@ -25,6 +25,7 @@ CREATE TABLE jurnal_harian (
     solusi TEXT,
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     komentar_pembimbing TEXT,
+    tanggal_review TIMESTAMP NULL DEFAULT NULL,
     nilai_apresiasi INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_siswa) REFERENCES users(id) ON DELETE CASCADE
@@ -48,6 +49,16 @@ CREATE TABLE relasi_bimbingan (
     FOREIGN KEY (id_pembimbing) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (id_siswa) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE KEY unique_relasi (id_pembimbing, id_siswa)
+);
+
+-- Audit table for relation changes
+CREATE TABLE IF NOT EXISTS relasi_audit (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    action_type VARCHAR(50) NOT NULL,
+    performed_by INT NOT NULL,
+    details TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (performed_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Pengumuman table
